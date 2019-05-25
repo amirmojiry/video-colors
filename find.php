@@ -47,11 +47,10 @@ for ($i = 1; $i <= $all_frames; $i++) {
 	echo "<span style='background-color:rgb($red_m_f, $green_m_f, $blue_m_f)'>
 	$i - $until_now</span>";
 }
-$end = microtime(true);
-$finish = $end - $start;
+$finish = round(microtime(true) - $start);
 $red_m = round ($red_m);
 $green_m = round ($green_m);
 $blue_m = round ($blue_m);
 echo "<br>";
 echo "<div style='background-color:rgb($red_m, $green_m, $blue_m)'>
-	Average color of video - time $finish</div>";
+	Average color of video - time $finish seconds</div>";
