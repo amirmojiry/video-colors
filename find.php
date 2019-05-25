@@ -1,18 +1,27 @@
 <?php
 
-echo shell_exec("ffmpeg -i sample.mkv -vf 'select=eq(pict_type\,I)' -vsync vfr sample/sample%d.jpg -hide_banner");
+ini_set('max_execution_time', 1200); //1200 seconds = 20 minutes
 
-
-ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 $start = microtime(true);
 
-$fi = new FilesystemIterator (__DIR__."/sample", FilesystemIterator::SKIP_DOTS);
+/**
+* for every frames:
+* ffmpeg -i [video_name.video_ext] frames/sample%d.jpg -hide_banner
+* for every seconds:
+* ffmpeg -i [video_name.video_ext] -vf fps=1 frames/sample%d.jpg -hide_banner
+* for every keyframes:
+* ffmpeg -i [video_name.video_ext] -vf 'select=eq(pict_type\,I)'
+* 			 -vsync vfr frames/sample%d.jpg -hide_banner
+*/
+echo shell_exec("ffmpeg -i sample.mkv -vf 'select=eq(pict_type\,I)' -vsync vfr frames/sample%d.jpg -hide_banner");
+
+$fi = new FilesystemIterator (__DIR__."/frames", FilesystemIterator::SKIP_DOTS);
 $all_frames = iterator_count ($fi);
 
 
 $red_m = $green_m = $blue_m = 0;
 for ($i = 1; $i <= $all_frames; $i++) {
-	$img = "sample/sample$i.jpg";
+	$img = "frames/sample$i.jpg";
 	$imgHand = imagecreatefromjpeg($img);
 	$imgSize = GetImageSize ($img);
 	$imgWidth = $imgSize[0];
@@ -34,9 +43,9 @@ for ($i = 1; $i <= $all_frames; $i++) {
 	$green_m += $green_m_f/$all_frames;
 	$blue_m_f = round($blue/$sum_pixels);
 	$blue_m += $blue_m_f/$all_frames;
-	$until_now = microtime(true) - $start;
-	echo "<div style='background-color:rgb($red_m_f, $green_m_f, $blue_m_f)'>
-	Average color of image number $i - time $until_now</div>";
+	$until_now = round(microtime(true) - $start);
+	echo "<span style='background-color:rgb($red_m_f, $green_m_f, $blue_m_f)'>
+	$i - $until_now</span>";
 }
 $end = microtime(true);
 $finish = $end - $start;
